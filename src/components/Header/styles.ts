@@ -17,6 +17,10 @@ export const Container = styled.div<ContainerProps>`
     justify-content: space-between;
 
     nav {
+      .active {
+        border-bottom: 2px solid #ff872c;
+        padding-bottom: 10px;
+      }
       a {
         color: #fff;
         text-decoration: none;
