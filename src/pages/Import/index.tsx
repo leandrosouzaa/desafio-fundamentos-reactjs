@@ -1,7 +1,6 @@
+/* eslint-disable array-callback-return */
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-
-import filesize from 'filesize';
 
 import Header from '../../components/Header';
 import FileList from '../../components/FileList';
@@ -23,25 +22,32 @@ const Import: React.FC = () => {
   const history = useHistory();
 
   async function handleUpload(): Promise<void> {
-    const data = new FormData();
-    data.append('file', uploadedFiles[0].file);
-    // TODO
+    await Promise.all(
+      uploadedFiles.map(uFile => {
+        const data = new FormData();
+        data.append('file', uFile.file);
 
-    try {
-      await api.post('/transactions/import', data);
-      history.goBack();
-    } catch (err) {
-      console.log(err.response.error);
-    }
+        try {
+          api.post('/transactions/import', data);
+        } catch (err) {
+          console.log(err.error.message);
+        }
+      }),
+    );
+
+    history.goBack();
   }
 
   function submitFile(files: File[]): void {
-    const file = files.map(f => ({
-      file: f,
-      name: f.name,
-      readableSize: String(filesize(f.size)),
-    }));
-    setUploadedFiles(file);
+    files.map(f => {
+      const file: FileProps = {
+        file: f,
+        name: f.name,
+        readableSize: String(f.size),
+      };
+
+      setUploadedFiles([...uploadedFiles, file]);
+    });
   }
 
   return (
